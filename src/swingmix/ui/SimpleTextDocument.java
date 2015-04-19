@@ -1,0 +1,181 @@
+package swingmix.ui;
+
+import java.util.*;
+import javax.swing.event.*;
+import javax.swing.event.DocumentEvent.ElementChange;
+import javax.swing.event.DocumentEvent.EventType;
+import javax.swing.text.*;
+
+/**
+ * created 2011-05-03
+ * @author jan
+ */
+public class SimpleTextDocument implements Document {
+  private PlainDocument doc = new PlainDocument();
+  private Set<DocumentListener> myListeners = new HashSet<>();
+  private DocumentListener docListener = new DocumentListener() {
+    DocumentEvent withDocument(final DocumentEvent e, final Document document) {
+      return new DocumentEvent() {
+
+        @Override
+        public int getOffset() {
+          return e.getOffset();
+        }
+
+        @Override
+        public int getLength() {
+          return e.getLength();
+        }
+
+        @Override
+        public Document getDocument() {
+          return document;
+        }
+
+        @Override
+        public EventType getType() {
+          return e.getType();
+        }
+
+        @Override
+        public ElementChange getChange(Element elem) {
+          return e.getChange(elem);
+        }
+      };
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+      for (DocumentListener listener : myListeners)
+        listener.insertUpdate(withDocument(e, SimpleTextDocument.this));
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+      for (DocumentListener listener : myListeners)
+        listener.removeUpdate(withDocument(e, SimpleTextDocument.this));
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+      for (DocumentListener listener : myListeners)
+        listener.changedUpdate(withDocument(e, SimpleTextDocument.this));
+    }
+  };
+
+  public SimpleTextDocument() {
+    doc.addDocumentListener(docListener);
+  }
+
+  public String getText() {
+    try {
+      return getText(0, getLength());
+    } catch (BadLocationException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  public void setText(String text) {
+    if (text == null)
+      text = "";
+    
+    int minLen = Math.min(text.length(), getLength());
+    try {
+      doc.replace(0, minLen, text, null);
+      if (minLen < getLength()) {
+        remove(minLen, getLength() - minLen);
+      }
+      if (minLen < text.length()) {
+        insertString(minLen, text.substring(minLen), null);
+      }
+    } catch (BadLocationException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+  
+  @Override
+  public void addDocumentListener(DocumentListener listener) {
+    myListeners.add(listener);
+  }
+
+  @Override
+  public void addUndoableEditListener(UndoableEditListener listener) {
+    doc.addUndoableEditListener(listener);
+  }
+
+  @Override
+  public synchronized Position createPosition(int offs) throws BadLocationException {
+    return doc.createPosition(offs);
+  }
+
+  @Override
+  public Element getDefaultRootElement() {
+    return doc.getDefaultRootElement();
+  }
+
+  @Override
+  public final Position getEndPosition() {
+    return doc.getEndPosition();
+  }
+
+  @Override
+  public int getLength() {
+    return doc.getLength();
+  }
+
+  @Override
+  public final Object getProperty(Object key) {
+    return doc.getProperty(key);
+  }
+
+  @Override
+  public Element[] getRootElements() {
+    return doc.getRootElements();
+  }
+
+  @Override
+  public final Position getStartPosition() {
+    return doc.getStartPosition();
+  }
+
+  @Override
+  public void getText(int offset, int length, Segment txt) throws BadLocationException {
+    doc.getText(offset, length, txt);
+  }
+
+  @Override
+  public String getText(int offset, int length) throws BadLocationException {
+    return doc.getText(offset, length);
+  }
+
+  @Override
+  public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+    doc.insertString(offs, str, a);
+  }
+
+  @Override
+  public final void putProperty(Object key, Object value) {
+    doc.putProperty(key, value);
+  }
+
+  @Override
+  public void remove(int offs, int len) throws BadLocationException {
+    doc.remove(offs, len);
+  }
+
+  @Override
+  public void removeDocumentListener(DocumentListener listener) {
+    myListeners.remove(listener);
+  }
+
+  @Override
+  public void removeUndoableEditListener(UndoableEditListener listener) {
+    doc.removeUndoableEditListener(listener);
+  }
+
+  @Override
+  public void render(Runnable r) {
+    doc.render(r);
+  }
+
+}
