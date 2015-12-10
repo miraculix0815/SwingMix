@@ -170,26 +170,4 @@ public class JEscapeDialog extends JDialog implements ContainerListener, KeyList
 //Redefine this function in subclasses to respond to ENTER key differently
   }
 
-  /**
-   * <p>
-   * Sets visiblility of this dialog.
-   * </p>
-   * <p>
-   * If <code>b</code> is <code>true</code>
-   * the location of this dialog is set to the center of the owing window.
-   * If <code>getOwner()</code> returns <code>null</code> it is set to the
-   * center of the screen.
-   * </p>
-   * <p>
-   * If <code>b</code> is <code>false</code>
-   * after hiding this dialog <code>dispose()</code> is called.
-   * 
-   * @see java.awt.Dialog#setVisible(boolean)
-   */
-  @Override
-  public void setVisible(boolean b) {
-    super.setVisible(b);
-    if (! b) dispose();
-  }
-
 }
