@@ -35,17 +35,29 @@
 package swingmix.ui;
 
 import java.io.File;
+import java.nio.file.*;
 
 /**
  * created 2011-05-03
  * @author jan
  */
 public class FileDocument extends SimpleTextDocument {
+  @Deprecated
   public File getFile() {
     return new File(getText());
   }
 
+  @Deprecated
   public void setFile(File file) {
     setText(file.toString());
   }
+  
+  public Path getPath() {
+    return Paths.get(getText());
+  }
+  
+  public void setFile(Path path) {
+    setText(path.toString());
+  }
+  
 }
