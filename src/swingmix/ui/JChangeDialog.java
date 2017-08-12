@@ -36,6 +36,7 @@ package swingmix.ui;
 
 import java.awt.Window;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.logging.*;
 import javax.swing.*;
 
@@ -72,7 +73,7 @@ public abstract class JChangeDialog<T>
     this.dataNew = false;
     try {
       this.data = supplyNewInstance();
-    } catch (InstantiationException | IllegalAccessException ex) {
+    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | IllegalArgumentException | InvocationTargetException ex) {
       Logger.getLogger(JChangeDialog.class.getName()).log(Level.SEVERE, null, ex);
       return null;
     }
@@ -90,9 +91,11 @@ public abstract class JChangeDialog<T>
    * @return a new Instance of T
    * @throws InstantiationException
    * @throws IllegalAccessException 
+   * @throws java.lang.NoSuchMethodException 
+   * @throws java.lang.reflect.InvocationTargetException 
    */
-  protected T supplyNewInstance() throws InstantiationException, IllegalAccessException {
-    return getGenericClass().newInstance();
+  protected T supplyNewInstance() throws InstantiationException, IllegalAccessException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
+    return getGenericClass().getDeclaredConstructor().newInstance();
   }
 
   /**
