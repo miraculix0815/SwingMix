@@ -14,106 +14,167 @@ import static swingmix.ui.PreferencesBinding.*;
  */
 public class PreferencesBindingTest {
   
-  private static final UUID TEST_NODE = UUID.randomUUID();
-  private static final PreferencesBinding BINDING = new PreferencesBinding(TEST_NODE.toString());
+  private final UUID TEST_NODE = UUID.randomUUID();
+  private PreferencesBinding binding;
   
-  @AfterClass
-  public static void afterClass() throws BackingStoreException {
+  @Before
+  public void before() throws BackingStoreException {
+    binding = new PreferencesBinding(TEST_NODE.toString());
+  }
+  
+  @After
+  public void after() throws BackingStoreException {
     Preferences.userRoot().node(TEST_NODE.toString()).removeNode();
   }
   
   @Test
   public void testCheckBoxRestoreFalse() {
-    BINDING.getPreferences().putBoolean("checkBox", false);
+    binding.getPreferences().putBoolean("checkBox", false);
     JCheckBox checkBox = new JCheckBox();
     checkBox.setSelected(true);
     
-    BINDING.addBinding(checkBox, "checkBox", true);
-    BINDING.restorePersistentValues();
+    binding.addBinding(checkBox, "checkBox", true);
+    binding.restorePersistentValues();
     assertFalse(checkBox.isSelected());
-    BINDING.removeBinding(checkBox);
+    binding.removeBinding(checkBox);
   }
       
   @Test
   public void testCheckBoxRestoreTrue() {
-    BINDING.getPreferences().putBoolean("checkBox", true);
+    binding.getPreferences().putBoolean("checkBox", true);
     JCheckBox checkBox = new JCheckBox();
     checkBox.setSelected(false);
     
-    BINDING.addBinding(checkBox, "checkBox", false);
-    BINDING.restorePersistentValues();
+    binding.addBinding(checkBox, "checkBox", false);
+    binding.restorePersistentValues();
     assertTrue(checkBox.isSelected());
-    BINDING.removeBinding(checkBox);
+    binding.removeBinding(checkBox);
   }
 
   @Test
   public void testCheckBoxStoreFalse() {
-    BINDING.getPreferences().putBoolean("checkBox", true);
+    binding.getPreferences().putBoolean("checkBox", true);
     JCheckBox checkBox = new JCheckBox();
     checkBox.setSelected(true);
 
-    BINDING.addBinding(checkBox, "checkBox", true);
+    binding.addBinding(checkBox, "checkBox", true);
+    binding.restorePersistentValues();
     checkBox.setSelected(false);
-    assertFalse(BINDING.getPreferences().getBoolean("checkBox", true));
-    BINDING.removeBinding(checkBox);
+    assertFalse(binding.getPreferences().getBoolean("checkBox", true));
+    binding.removeBinding(checkBox);
   }
 
   @Test
   public void testCheckBoxStoreTrue() {
-    BINDING.getPreferences().putBoolean("checkBox", false);
+    binding.getPreferences().putBoolean("checkBox", false);
     JCheckBox checkBox = new JCheckBox();
     checkBox.setSelected(false);
 
-    BINDING.addBinding(checkBox, "checkBox", false);
+    binding.addBinding(checkBox, "checkBox", false);
+    binding.restorePersistentValues();
     checkBox.setSelected(true);
-    assertTrue(BINDING.getPreferences().getBoolean("checkBox", false));
-    BINDING.removeBinding(checkBox);
+    assertTrue(binding.getPreferences().getBoolean("checkBox", false));
+    binding.removeBinding(checkBox);
   }
   
   @Test
   public void testTextFieldRestore() {
-    BINDING.getPreferences().put("textField", "test text");
+    binding.getPreferences().put("textField", "test text");
     JTextField textField = new JTextField();
     
-    BINDING.addBinding(textField, "textField", "");
-    BINDING.restorePersistentValues();
+    binding.addBinding(textField, "textField", "");
+    binding.restorePersistentValues();
     assertEquals("test text", textField.getText());
-    BINDING.removeBinding(textField);    
+    binding.removeBinding(textField);    
   }
 
   @Test
   public void testTextFieldStoreText() {
-    BINDING.getPreferences().remove("textField");
     JTextField textField = new JTextField();
     
-    BINDING.addBinding(textField, "textField", "");
+    binding.addBinding(textField, "textField", "");
+    binding.restorePersistentValues();
     textField.setText("test text");
-    assertEquals("test text", BINDING.getPreferences().get("textField", ""));
-    BINDING.removeBinding(textField);
+    assertEquals("test text", binding.getPreferences().get("textField", ""));
+    binding.removeBinding(textField);
   }
   
   @Test
   public void testSpinnerRestoreInteger() {
-    BINDING.getPreferences().putByteArray("integer spinner", toByteArray(1));
+    binding.getPreferences().putByteArray("integer spinner", toByteArray(1));
     JSpinner spinner =  new JSpinner();
     
-    BINDING.addBinding(spinner, "integer spinner", 0);
-    BINDING.restorePersistentValues();
+    binding.addBinding(spinner, "integer spinner", 0);
+    binding.restorePersistentValues();
     assertEquals(1, spinner.getValue());
-    BINDING.removeBinding(spinner);    
+    binding.removeBinding(spinner);    
   }
 
   @Test
   public void testSpinnerStoreInteger() {
-    BINDING.getPreferences().remove("integer spinner");
-    JSpinner spinner =  new JSpinner();
+    JSpinner spinner = new JSpinner();
     
-    BINDING.addBinding(spinner, "integer spinner", 0);
+    binding.addBinding(spinner, "integer spinner", 0);
     spinner.setValue(1);
     assertEquals(1, 
-            toObject(BINDING.getPreferences()
+            toObject(binding.getPreferences()
             .getByteArray("integer spinner", toByteArray(1))));
-    BINDING.removeBinding(spinner);
+    binding.removeBinding(spinner);
+  }
+  
+  @Test
+  public void testTableModelMoveColumn() {
+    String prefix = "test table";
+    binding.getPreferences().remove(prefix);
+    JTable table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    binding.restorePersistentValues();
+    
+    assertEquals(3, binding.getPreferences().getInt(PreferencesBinding.toColumnCountKey(prefix), -1));
+    assertEquals(-1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelIndexAt(prefix, 0), -1));
+    assertEquals(-1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelIndexAt(prefix, 1), -1));
+    table.getColumnModel().moveColumn(0, 1);
+    assertEquals(1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelIndexAt(prefix, 0), -1));
+    assertEquals(0, binding.getPreferences().getInt(PreferencesBinding.toColumnModelIndexAt(prefix, 1), -1));
+    assertEquals(2, binding.getPreferences().getInt(PreferencesBinding.toColumnModelIndexAt(prefix, 2), -1));
+    binding.removeBinding(table);
+    
+    table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    assertEquals(0, table.getColumnModel().getColumn(0).getModelIndex());
+    assertEquals(1, table.getColumnModel().getColumn(1).getModelIndex());
+    binding.restorePersistentValues();
+    assertEquals(1, table.getColumnModel().getColumn(0).getModelIndex());
+    assertEquals(0, table.getColumnModel().getColumn(1).getModelIndex());
+    binding.removeBinding(table);
+  }
+  
+  @Test
+  public void testTableModelColumnWidthChange() {
+    String prefix = "test table";
+    JTable table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    binding.restorePersistentValues();
+
+    assertEquals(-1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelWidthAt(prefix, 0), -1));
+    assertEquals(-1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelWidthAt(prefix, 1), -1));
+    table.getColumnModel().getColumn(0).setWidth(100);
+    table.getColumnModel().getColumn(1).setWidth(200);
+    assertEquals(100, binding.getPreferences().getInt(PreferencesBinding.toColumnModelWidthAt(prefix, 0), -1));
+    assertEquals(200, binding.getPreferences().getInt(PreferencesBinding.toColumnModelWidthAt(prefix, 1), -1));
+    assertEquals(-1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelWidthAt(prefix, 2), -1));
+    binding.removeBinding(table);
+
+    table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    assertEquals(75, table.getColumnModel().getColumn(0).getWidth());
+    assertEquals(75, table.getColumnModel().getColumn(1).getWidth());
+    assertEquals(75, table.getColumnModel().getColumn(2).getWidth());
+    binding.restorePersistentValues();
+    assertEquals(100, table.getColumnModel().getColumn(0).getWidth());
+    assertEquals(200, table.getColumnModel().getColumn(1).getWidth());
+    assertEquals(75, table.getColumnModel().getColumn(2).getWidth());
+    binding.removeBinding(table);
   }
   
 }
