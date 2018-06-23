@@ -47,8 +47,9 @@ import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.text.*;
+import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.table.*;
 
 /**
  * created 2011-05-10
@@ -66,8 +67,8 @@ public class PreferencesBinding {
   private final Map<SpinnerModel, String> serializableKeys = new HashMap<>();
   private final Map<SpinnerModel, Serializable> serializableDefaults = new HashMap<>();
   
-  private final Map<TableColumnModel, String> tableColumnModelKeys = new HashMap<>();
-  private final Map<TableColumn, String> tableColumnKeys = new HashMap<>();
+  private final Map<TableColumnModelExt, String> tableColumnModelKeys = new HashMap<>();
+  private final Map<TableColumnExt, String> tableColumnKeys = new HashMap<>();
   
   private boolean persistenceActive = false;
   
@@ -138,16 +139,15 @@ public class PreferencesBinding {
       if (! persistenceActive)
         return;
 
-      if (e.getSource() instanceof TableColumnModel) {
-        TableColumnModel model = (TableColumnModel) e.getSource();
-        Map<TableColumn, Integer> visiblePosition = new HashMap<>();
-        Enumeration<TableColumn> enumeration = model.getColumns();
-        int pos = 0;
-        while (enumeration.hasMoreElements()) {
-          visiblePosition.put(enumeration.nextElement(), pos++);
+      if (e.getSource() instanceof TableColumnModelExt) {
+        TableColumnModelExt model = (TableColumnModelExt) e.getSource();
+        Map<TableColumnExt, Integer> visiblePosition = new HashMap<>();
+        List<TableColumn> allColumns = model.getColumns(false);
+        for (int pos = 0; pos < allColumns.size(); pos++) {
+          visiblePosition.put(((TableColumnExt) allColumns.get(pos)), pos);
         }
-        Map<Integer, TableColumn> modelIndexMap = visiblePosition.keySet().stream()
-                .collect(Collectors.toMap(TableColumn::getModelIndex, Function.identity()));
+        Map<Integer, TableColumnExt> modelIndexMap = visiblePosition.keySet().stream()
+                .collect(Collectors.toMap(TableColumnExt::getModelIndex, Function.identity()));
         
         String persistenceKey = tableColumnModelKeys.get(model);
         if (persistenceKey != null) {
@@ -178,8 +178,8 @@ public class PreferencesBinding {
       if (! persistenceActive)
         return;
 
-      if (e.getSource() instanceof TableColumn) {
-        TableColumn column = (TableColumn) e.getSource();
+      if (e.getSource() instanceof TableColumnExt) {
+        TableColumnExt column = (TableColumnExt) e.getSource();
         String persistenceKeyPrefix = tableColumnKeys.get(column);
         if ("width".equals(e.getPropertyName()) && Integer.class.isInstance(e.getNewValue())) {
           preferences.putInt(toColumnModelWidthAt(persistenceKeyPrefix, column.getModelIndex()), (int) e.getNewValue());
@@ -243,19 +243,19 @@ public class PreferencesBinding {
     spinner.getModel().removeChangeListener(serializableChangeListener);
   }
   
-  public void addBinding(JTable table, String persistenceKey) {
-    TableColumnModel model = table.getColumnModel();
+  public void addBinding(JXTable table, String persistenceKey) {
+    TableColumnModelExt model = (TableColumnModelExt) table.getColumnModel();
     tableColumnModelKeys.put(model, persistenceKey);
     model.addColumnModelListener(tableColumnModelListener);
     for (int col = 0; col < model.getColumnCount(); col++) {
       model.getColumn(col).addPropertyChangeListener(tableColumnPropertyChangeListener);
-      tableColumnKeys.put(model.getColumn(col), persistenceKey);
+      tableColumnKeys.put(model.getColumnExt(col), persistenceKey);
     }
     preferences.putInt(toColumnCountKey(persistenceKey), model.getColumnCount());
   }
 
-  public void removeBinding(JTable table) {
-    tableColumnModelKeys.remove(table.getColumnModel());
+  public void removeBinding(JXTable table) {
+    tableColumnModelKeys.remove((TableColumnModelExt) table.getColumnModel());
     table.getColumnModel().removeColumnModelListener(tableColumnModelListener);
     for (int col = 0; col < table.getColumnModel().getColumnCount(); col++) {
       tableColumnKeys.remove(table.getColumnModel().getColumn(col));
@@ -285,14 +285,14 @@ public class PreferencesBinding {
       binding.getKey().setValue(toObject(serializedObject));
     }
     
-    for (Entry<TableColumnModel, String> binding : tableColumnModelKeys.entrySet()) {
+    for (Entry<TableColumnModelExt, String> binding : tableColumnModelKeys.entrySet()) {
       String keyPrefix = binding.getValue();
       int storedColumnCount = preferences.getInt(toColumnCountKey(keyPrefix), 0);
       SortedMap<Integer, Integer> modelToView = new TreeMap<>();
       for (int col = 0; col < storedColumnCount; col++) {
         modelToView.put(col, preferences.getInt(toColumnModelIndexAt(keyPrefix, col), col));
       }
-      TableColumnModel model = binding.getKey();
+      TableColumnModelExt model = binding.getKey();
       for (int modelColumn = 0; modelColumn < storedColumnCount; modelColumn++) {
         int viewColumn = modelToView.getOrDefault(modelColumn, modelColumn);
         if (viewColumn < modelColumn) {
@@ -301,7 +301,7 @@ public class PreferencesBinding {
       }
       
       for (int col = 0; col < model.getColumnCount();col++) {
-        TableColumn tableColumn = model.getColumn(col);
+        TableColumnExt tableColumn = model.getColumnExt(col);
         tableColumn.setWidth(preferences.getInt(toColumnModelWidthAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.getWidth()));
       }
     }

@@ -1,9 +1,9 @@
 package swingmix.ui;
 
-import swingmix.ui.PreferencesBinding;
 import java.util.UUID;
 import java.util.prefs.*;
 import javax.swing.*;
+import org.jdesktop.swingx.JXTable;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static swingmix.ui.PreferencesBinding.*;
@@ -126,7 +126,7 @@ public class PreferencesBindingTest {
   public void testTableModelMoveColumn() {
     String prefix = "test table";
     binding.getPreferences().remove(prefix);
-    JTable table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    JXTable table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
     binding.addBinding(table, prefix);
     binding.restorePersistentValues();
     
@@ -139,7 +139,7 @@ public class PreferencesBindingTest {
     assertEquals(2, binding.getPreferences().getInt(PreferencesBinding.toColumnModelIndexAt(prefix, 2), -1));
     binding.removeBinding(table);
     
-    table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
     binding.addBinding(table, prefix);
     assertEquals(0, table.getColumnModel().getColumn(0).getModelIndex());
     assertEquals(1, table.getColumnModel().getColumn(1).getModelIndex());
@@ -152,7 +152,7 @@ public class PreferencesBindingTest {
   @Test
   public void testTableModelColumnWidthChange() {
     String prefix = "test table";
-    JTable table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    JXTable table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
     binding.addBinding(table, prefix);
     binding.restorePersistentValues();
 
@@ -165,7 +165,7 @@ public class PreferencesBindingTest {
     assertEquals(-1, binding.getPreferences().getInt(PreferencesBinding.toColumnModelWidthAt(prefix, 2), -1));
     binding.removeBinding(table);
 
-    table = new JTable(new String[][]{}, new String[] { "a", "b", "c" });
+    table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
     binding.addBinding(table, prefix);
     assertEquals(75, table.getColumnModel().getColumn(0).getWidth());
     assertEquals(75, table.getColumnModel().getColumn(1).getWidth());
