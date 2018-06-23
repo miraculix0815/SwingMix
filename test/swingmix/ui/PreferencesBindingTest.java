@@ -168,13 +168,13 @@ public class PreferencesBindingTest {
 
     table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
     binding.addBinding(table, prefix);
-    assertEquals(75, table.getColumnModel().getColumn(0).getWidth());
-    assertEquals(75, table.getColumnModel().getColumn(1).getWidth());
-    assertEquals(75, table.getColumnModel().getColumn(2).getWidth());
+    assertEquals(75, table.getColumnModel().getColumn(0).getPreferredWidth());
+    assertEquals(75, table.getColumnModel().getColumn(1).getPreferredWidth());
+    assertEquals(75, table.getColumnModel().getColumn(2).getPreferredWidth());
     binding.restorePersistentValues();
-    assertEquals(100, table.getColumnModel().getColumn(0).getWidth());
-    assertEquals(200, table.getColumnModel().getColumn(1).getWidth());
-    assertEquals(75, table.getColumnModel().getColumn(2).getWidth());
+    assertEquals(100, table.getColumnModel().getColumn(0).getPreferredWidth());
+    assertEquals(200, table.getColumnModel().getColumn(1).getPreferredWidth());
+    assertEquals(75, table.getColumnModel().getColumn(2).getPreferredWidth());
     binding.removeBinding(table);
   }
   
