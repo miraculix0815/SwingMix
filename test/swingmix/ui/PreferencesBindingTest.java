@@ -230,4 +230,17 @@ public class PreferencesBindingTest {
     binding.removeBinding(table);
   }
   
+  @Test
+  public void testTableModelBindToHiddenColumns() {
+    String prefix = "test table";
+    JXTable table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
+    ((TableColumnExt) table.getColumns(true).get(1)).setVisible(false);
+    
+    binding.addBinding(table, prefix);
+    binding.restorePersistentValues();
+    ((TableColumnExt) table.getColumns(true).get(1)).setVisible(true);
+    assertEquals(true, binding.getPreferences().getBoolean(PreferencesBinding.toColumnModelVisibleAt(prefix, 1), false));
+    binding.removeBinding(table);
+  }
+  
 }

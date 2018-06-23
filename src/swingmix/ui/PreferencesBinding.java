@@ -252,9 +252,10 @@ public class PreferencesBinding {
     TableColumnModelExt model = (TableColumnModelExt) table.getColumnModel();
     tableColumnModelKeys.put(model, persistenceKey);
     model.addColumnModelListener(tableColumnModelListener);
-    for (int col = 0; col < model.getColumnCount(); col++) {
-      model.getColumn(col).addPropertyChangeListener(tableColumnPropertyChangeListener);
-      tableColumnKeys.put(model.getColumnExt(col), persistenceKey);
+    for (int col = 0; col < model.getColumnCount(true); col++) {
+      TableColumnExt column = (TableColumnExt) model.getColumns(true).get(col);
+      column.addPropertyChangeListener(tableColumnPropertyChangeListener);
+      tableColumnKeys.put(column, persistenceKey);
     }
     preferences.putInt(toColumnCountKey(persistenceKey), model.getColumnCount(true));
   }
