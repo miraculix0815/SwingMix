@@ -34,15 +34,13 @@
 
 package swingmix.ui;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.beans.*;
 import java.io.*;
-import java.util.*;
 import java.util.Map.Entry;
+import java.util.*;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.prefs.*;
+import java.util.logging.*;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -184,6 +182,9 @@ public class PreferencesBinding {
         if ("width".equals(e.getPropertyName()) && Integer.class.isInstance(e.getNewValue())) {
           preferences.putInt(toColumnModelWidthAt(persistenceKeyPrefix, column.getModelIndex()), (int) e.getNewValue());
         }
+        if ("visible".equals(e.getPropertyName()) && Boolean.class.isInstance(e.getNewValue())) {
+          preferences.putBoolean(toColumnModelVisibleAt(persistenceKeyPrefix, column.getModelIndex()), (boolean) e.getNewValue());
+        }
       }
     }
   };
@@ -198,6 +199,10 @@ public class PreferencesBinding {
   
   static String toColumnModelWidthAt(String persistenceKeyPrefix, int modelIndex) {
     return persistenceKeyPrefix + ".columnModelIndex" + modelIndex + ".width";
+  }
+
+  static String toColumnModelVisibleAt(String persistenceKeyPrefix, int modelIndex) {
+    return persistenceKeyPrefix + ".columnModelIndex" + modelIndex + ".visible";
   }
 
   public PreferencesBinding(String path) {
@@ -251,7 +256,7 @@ public class PreferencesBinding {
       model.getColumn(col).addPropertyChangeListener(tableColumnPropertyChangeListener);
       tableColumnKeys.put(model.getColumnExt(col), persistenceKey);
     }
-    preferences.putInt(toColumnCountKey(persistenceKey), model.getColumnCount());
+    preferences.putInt(toColumnCountKey(persistenceKey), model.getColumnCount(true));
   }
 
   public void removeBinding(JXTable table) {
@@ -300,9 +305,10 @@ public class PreferencesBinding {
         }
       }
       
-      for (int col = 0; col < model.getColumnCount();col++) {
-        TableColumnExt tableColumn = model.getColumnExt(col);
+      for (TableColumn tc : model.getColumns(true)) {
+        TableColumnExt tableColumn = (TableColumnExt) tc;
         tableColumn.setWidth(preferences.getInt(toColumnModelWidthAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.getWidth()));
+        tableColumn.setVisible(preferences.getBoolean(toColumnModelVisibleAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.isVisible()));
       }
     }
     

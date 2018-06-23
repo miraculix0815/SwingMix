@@ -4,8 +4,9 @@ import java.util.UUID;
 import java.util.prefs.*;
 import javax.swing.*;
 import org.jdesktop.swingx.JXTable;
-import org.junit.*;
+import org.jdesktop.swingx.table.TableColumnExt;
 import static org.junit.Assert.*;
+import org.junit.*;
 import static swingmix.ui.PreferencesBinding.*;
 
 /**
@@ -174,6 +175,58 @@ public class PreferencesBindingTest {
     assertEquals(100, table.getColumnModel().getColumn(0).getWidth());
     assertEquals(200, table.getColumnModel().getColumn(1).getWidth());
     assertEquals(75, table.getColumnModel().getColumn(2).getWidth());
+    binding.removeBinding(table);
+  }
+  
+  @Test
+  public void testTableModelColumnNotVisible() {
+    String prefix = "test table";
+    JXTable table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    binding.restorePersistentValues();
+
+    assertEquals(true, binding.getPreferences().getBoolean(PreferencesBinding.toColumnModelVisibleAt(prefix, 0), true));
+    assertEquals(true, binding.getPreferences().getBoolean(PreferencesBinding.toColumnModelVisibleAt(prefix, 1), true));
+    table.getColumnExt(1).setVisible(false);
+    assertEquals(true, binding.getPreferences().getBoolean(PreferencesBinding.toColumnModelVisibleAt(prefix, 0), true));
+    assertEquals(false, binding.getPreferences().getBoolean(PreferencesBinding.toColumnModelVisibleAt(prefix, 1), true));
+    assertEquals(true, binding.getPreferences().getBoolean(PreferencesBinding.toColumnModelVisibleAt(prefix, 2), true));
+    binding.removeBinding(table);
+
+    table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(0)).isVisible());
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(1)).isVisible());
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(2)).isVisible());
+    binding.restorePersistentValues();
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(0)).isVisible());
+    assertEquals(false, ((TableColumnExt) table.getColumns(true).get(1)).isVisible());
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(2)).isVisible());
+    binding.removeBinding(table);
+  }
+  
+  @Test
+  public void testTableModelColumsHiddenAndMoved() {
+    String prefix = "test table";
+    JXTable table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    binding.restorePersistentValues();
+
+    table.getColumnExt(1).setVisible(false);
+    table.moveColumn(1, 0);
+    binding.removeBinding(table);
+
+    table = new JXTable(new String[][]{}, new String[] { "a", "b", "c" });
+    binding.addBinding(table, prefix);
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(0)).isVisible());
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(1)).isVisible());
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(2)).isVisible());
+    binding.restorePersistentValues();
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(0)).isVisible());
+    assertEquals(2, table.getColumnExt(0).getModelIndex());
+    assertEquals(false, ((TableColumnExt) table.getColumns(true).get(1)).isVisible());
+    assertEquals(true, ((TableColumnExt) table.getColumns(true).get(2)).isVisible());
+    assertEquals(0, table.getColumnExt(1).getModelIndex());
     binding.removeBinding(table);
   }
   
