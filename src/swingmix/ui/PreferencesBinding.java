@@ -292,23 +292,31 @@ public class PreferencesBinding {
     
     for (Entry<TableColumnModelExt, String> binding : tableColumnModelKeys.entrySet()) {
       String keyPrefix = binding.getValue();
+      TableColumnModelExt model = binding.getKey();
+      for (TableColumn tc : model.getColumns(true)) {
+        TableColumnExt tableColumn = (TableColumnExt) tc;
+        tableColumn.setPreferredWidth(preferences.getInt(toColumnModelWidthAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.getPreferredWidth()));
+        tableColumn.setVisible(preferences.getBoolean(toColumnModelVisibleAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.isVisible()));
+      }
+      
       int storedColumnCount = preferences.getInt(toColumnCountKey(keyPrefix), 0);
       SortedMap<Integer, Integer> modelToView = new TreeMap<>();
       for (int col = 0; col < storedColumnCount; col++) {
+        if (! ((TableColumnExt) model.getColumns(true).get(col)).isVisible())
+          continue;
+        
         modelToView.put(col, preferences.getInt(toColumnModelIndexAt(keyPrefix, col), col));
       }
-      TableColumnModelExt model = binding.getKey();
+      int visibleModelColumn = 0;
       for (int modelColumn = 0; modelColumn < storedColumnCount; modelColumn++) {
+        if (! ((TableColumnExt) model.getColumns(true).get(modelColumn)).isVisible())
+          continue;
+        
         int viewColumn = modelToView.getOrDefault(modelColumn, modelColumn);
-        if (viewColumn < modelColumn) {
-          model.moveColumn(viewColumn, modelColumn);
-        }
-      }
-      
-      for (TableColumn tc : model.getColumns(true)) {
-        TableColumnExt tableColumn = (TableColumnExt) tc;
-        tableColumn.setWidth(preferences.getInt(toColumnModelWidthAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.getWidth()));
-        tableColumn.setVisible(preferences.getBoolean(toColumnModelVisibleAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.isVisible()));
+        if (viewColumn < visibleModelColumn)
+          model.moveColumn(visibleModelColumn, viewColumn);
+        
+        visibleModelColumn++;
       }
     }
     
