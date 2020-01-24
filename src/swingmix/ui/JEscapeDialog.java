@@ -1,6 +1,6 @@
 /**
  *  Copyright 2009-2015 Jan Schlößin
- * 
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ package swingmix.ui;
 import java.awt.*;
 import java.awt.event.*;
 
-import javax.swing.JDialog;
+import javax.swing.*;
 
 /**
  * based on an article By Eugene Podgorbunskikh, JavaWorld.com, 03/01/99
@@ -67,11 +67,12 @@ public class JEscapeDialog extends JDialog implements ContainerListener, KeyList
 
   private void addKeyAndContainerListenerRecursively(Component c)
   {
-//To be on the safe side, try to remove KeyListener first just in case it has been added before.
-//If not, it won't do any harm
-       c.removeKeyListener(this);
-//Add KeyListener to the Component passed as an argument
-       c.addKeyListener(this);
+      //To be on the safe side, try to remove KeyListener first just in case it has been added before.
+      //If not, it won't do any harm
+      c.removeKeyListener(this);
+      //Add KeyListener to the Component passed as an argument
+      if (! (c instanceof JTextArea))
+        c.addKeyListener(this);
 
        if(c instanceof Container){
 
