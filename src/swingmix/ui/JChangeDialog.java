@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -42,9 +42,9 @@ import javax.swing.*;
 
 /**
  *
- * @author jan
+ * @author Jan Schlößin
  */
-public abstract class JChangeDialog<T> 
+public abstract class JChangeDialog<T>
   extends JEscapeDialog {
 
   private boolean dataNew;
@@ -53,15 +53,15 @@ public abstract class JChangeDialog<T>
   public JChangeDialog(Window parent) {
     super(parent);
   }
-  
+
   /**
    * While deriving from this you have to deliver the concrete class via this
    * method since java generics erase the type information on run time in 1.6.
-   * 
+   *
    * @return A Class object of T
    */
   protected abstract Class<T> getGenericClass();
-  
+
   /**
    * Shows the dialog and returns the values changed by the user as data.
    * @param title to decorate the dialog with
@@ -84,15 +84,15 @@ public abstract class JChangeDialog<T>
 
   /**
    * Creates a new instance of T using the default contructor.
-   * 
+   *
    * This method is to be overwritten to use an other way to create
    * instances of T.
-   * 
+   *
    * @return a new Instance of T
    * @throws InstantiationException
-   * @throws IllegalAccessException 
-   * @throws java.lang.NoSuchMethodException 
-   * @throws java.lang.reflect.InvocationTargetException 
+   * @throws IllegalAccessException
+   * @throws java.lang.NoSuchMethodException
+   * @throws java.lang.reflect.InvocationTargetException
    */
   protected T supplyNewInstance() throws InstantiationException, IllegalAccessException, NoSuchMethodException, IllegalArgumentException, InvocationTargetException {
     return getGenericClass().getDeclaredConstructor().newInstance();
@@ -113,7 +113,7 @@ public abstract class JChangeDialog<T>
     setVisible(true);
     return this.dataNew;
   }
-    
+
   @Override
   public void performEnterAction(KeyEvent e) {
     // don't perform in multi row element
@@ -134,7 +134,7 @@ public abstract class JChangeDialog<T>
    * @param data to assign to the components
    */
   protected abstract void assignToFields(T data);
-  
+
   /**
    * Subclasses has to overwrite this method to implement
    * the collection of values from visual components to
@@ -143,10 +143,10 @@ public abstract class JChangeDialog<T>
    * Don't perform any changes on the
    * (original) data before one can be sure that ervery
    * changes will be successful.
-   * 
+   *
    * @param data to set on from visual components
    * @return true if the values were assigned, false otherwise
    */
   protected abstract boolean collectFromFields(T data);
-  
+
 }

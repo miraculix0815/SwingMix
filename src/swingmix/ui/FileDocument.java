@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ import java.nio.file.*;
 
 /**
  * created 2011-05-03
- * @author jan
+ * @author Jan Schlößin
  */
 public class FileDocument extends SimpleTextDocument {
   @Deprecated
@@ -51,13 +51,13 @@ public class FileDocument extends SimpleTextDocument {
   public void setFile(File file) {
     setText(file.toString());
   }
-  
+
   public Path getPath() {
     return Paths.get(getText());
   }
-  
+
   public void setFile(Path path) {
     setText(path.toString());
   }
-  
+
 }

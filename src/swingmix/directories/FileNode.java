@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * created 2009-09-13
- * @author jan
+ * @author Jan Schlößin
  */
 public class FileNode extends DefaultMutableTreeNode implements Comparable<FileNode> {
 
@@ -56,7 +56,7 @@ public class FileNode extends DefaultMutableTreeNode implements Comparable<FileN
 
   public static FileNode newTop() {
     final FileNode top = new FileNode(NULL_FILE);
-    
+
     FileNode node;
     for (File root : File.listRoots()) {
       node = new FileNode(root);

@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -40,9 +40,9 @@ import javax.swing.SwingUtilities;
  * This class purpose is to collect events in a row and fire a task
  * at most once in 200 ms. This is a nice behaviour for keybord events
  * when you want a task to be executed when the user finished writing.
- * 
+ *
  * created 18.04.2015
- * @author jan
+ * @author Jan Schlößin
  */
 public class EventsCollectorThread extends Thread {
   public static EventsCollectorThread create(Runnable event) {
@@ -50,7 +50,7 @@ public class EventsCollectorThread extends Thread {
     thread.start();
     return thread;
   }
-  
+
   private long nextTimeToExecute = Long.MAX_VALUE;
   private final Runnable job;
 

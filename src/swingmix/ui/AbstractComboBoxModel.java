@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -39,7 +39,7 @@ import javax.swing.event.*;
 
 /**
  *
- * @author jan
+ * @author Jan Schlößin
  */
 public abstract class AbstractComboBoxModel
   extends AbstractListModel
@@ -54,7 +54,7 @@ public abstract class AbstractComboBoxModel
    * are specified by the closed interval index0, index1 -- the endpoints
    * are included.  Note that
    * index0 need not be less than or equal to index1.
-   * 
+   *
    * @param index0 one end of the new interval
    * @param index1 the other end of the new interval
    * @see EventListenerList
@@ -72,7 +72,7 @@ public abstract class AbstractComboBoxModel
    * are specified by a closed interval index0, index1 -- the enpoints
    * are included.  Note that
    * index0 need not be less than or equal to index1.
-   * 
+   *
    * @param index0 one end of the new interval
    * @param index1 the other end of the new interval
    * @see EventListenerList
@@ -85,11 +85,11 @@ public abstract class AbstractComboBoxModel
 
   /**
    * <code>AbstractComboBoxModel</code> subclasses must call this method
-   * <b>after</b> one or more elements are removed from the model. 
+   * <b>after</b> one or more elements are removed from the model.
    * <code>index0</code> and <code>index1</code> are the end points
    * of the interval that's been removed.  Note that <code>index0</code>
    * need not be less than or equal to <code>index1</code>.
-   * 
+   *
    * @param index0 one end of the removed interval,
    *               including <code>index0</code>
    * @param index1 the other end of the removed interval,

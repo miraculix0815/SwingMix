@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -39,14 +39,14 @@ import javax.swing.plaf.metal.*;
 
 /**
  * created 2011-05-03
- * @author jan
+ * @author Jan Schlößin
  */
 public abstract class NimbusPlatformFrame extends JFrame {
   public NimbusPlatformFrame() {
     tryToSetNimbus();
     setLocationByPlatform(true);
   }
-  
+
   private static void tryToSetNimbus() {
     try {
       for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {

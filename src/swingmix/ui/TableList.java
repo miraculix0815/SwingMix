@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -41,7 +41,7 @@ import javax.swing.table.*;
 /**
  *
  * @param <E> Element class
- * @author jan
+ * @author Jan Schlößin
  */
 public abstract class TableList<E> implements TableModel, List<E> {
 
@@ -268,5 +268,5 @@ public abstract class TableList<E> implements TableModel, List<E> {
   public void update(int index) {
     m.fireTableRowsUpdated(index, index);
   }
-  
+
 }

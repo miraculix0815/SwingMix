@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import java.io.File;
  * DirectoryChooseDialog.java
  *
  * Created on 25.09.2009, 09:40:05
- * @author jan
+ * @author Jan Schlößin
  */
 public class DirectoryChooseDialog extends JChangeDialog<DirectoryChooseDialog.FileContainer>
         implements DirectoryChangedListener {

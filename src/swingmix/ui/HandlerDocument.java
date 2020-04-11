@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import javax.swing.text.*;
 
 /**
  * created 2009-01-16
- * @author jan
+ * @author Jan Schlößin
  */
 public class HandlerDocument extends StreamHandler implements StyledDocument {
   private StyledDocument document = new DefaultStyledDocument();

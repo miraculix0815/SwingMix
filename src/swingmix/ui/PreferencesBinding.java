@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -51,31 +51,31 @@ import org.jdesktop.swingx.table.*;
 
 /**
  * created 2011-05-10
- * @author jan
+ * @author Jan Schlößin
  */
 public class PreferencesBinding {
-  
+
   private final Preferences preferences;
   private final Map<AbstractButton, String> buttonKeys = new HashMap<>();
   private final Map<AbstractButton, Boolean> buttonDefaults = new HashMap<>();
-  
+
   private final Map<Document, String> textKeys = new HashMap<>();
   private final Map<Document, String> textDefaults = new HashMap<>();
-  
+
   private final Map<SpinnerModel, String> serializableKeys = new HashMap<>();
   private final Map<SpinnerModel, Serializable> serializableDefaults = new HashMap<>();
-  
+
   private final Map<TableColumnModelExt, String> tableColumnModelKeys = new HashMap<>();
   private final Map<TableColumnExt, String> tableColumnKeys = new HashMap<>();
-  
+
   private boolean persistenceActive = false;
-  
+
   private final ChangeListener booleanChangeListener = new ChangeListener() {
     @Override
     public void stateChanged(ChangeEvent e) {
       if (! persistenceActive)
         return;
-      
+
       if (e.getSource() instanceof AbstractButton) {
         AbstractButton abstractButton = (AbstractButton) e.getSource();
         String persistenceKey = buttonKeys.get(abstractButton);
@@ -89,7 +89,7 @@ public class PreferencesBinding {
     public void insertUpdate(DocumentEvent e) {
       if (! persistenceActive)
         return;
-      
+
       String persistenceKey = textKeys.get(e.getDocument());
       if (persistenceKey != null)
         try {
@@ -112,7 +112,7 @@ public class PreferencesBinding {
     public void stateChanged(ChangeEvent e) {
       if (! persistenceActive)
         return;
-      
+
       if (e.getSource() instanceof SpinnerModel) {
         SpinnerModel model = (SpinnerModel) e.getSource();
         String persistenceKey = serializableKeys.get(model);
@@ -122,7 +122,7 @@ public class PreferencesBinding {
       }
     }
   };
-  
+
   private final TableColumnModelListener tableColumnModelListener = new TableColumnModelListener() {
     @Override
     public void columnAdded(TableColumnModelEvent e) {
@@ -146,7 +146,7 @@ public class PreferencesBinding {
         }
         Map<Integer, TableColumnExt> modelIndexMap = visiblePosition.keySet().stream()
                 .collect(Collectors.toMap(TableColumnExt::getModelIndex, Function.identity()));
-        
+
         String persistenceKey = tableColumnModelKeys.get(model);
         if (persistenceKey != null) {
           modelIndexMap.entrySet().stream()
@@ -157,7 +157,7 @@ public class PreferencesBinding {
                   });
         }
       }
-      
+
     }
 
     @Override
@@ -168,10 +168,10 @@ public class PreferencesBinding {
     public void columnSelectionChanged(ListSelectionEvent e) {
     }
   };
-  
+
   private final PropertyChangeListener tableColumnPropertyChangeListener = new PropertyChangeListener() {
 
-    @Override    
+    @Override
     public void propertyChange(PropertyChangeEvent e) {
       if (! persistenceActive)
         return;
@@ -188,15 +188,15 @@ public class PreferencesBinding {
       }
     }
   };
-  
+
   static String toColumnCountKey(String persistenceKeyPrefix) {
     return persistenceKeyPrefix + ".columnCount";
   }
-  
+
   static String toColumnModelIndexAt(String persistenceKeyPrefix, int modelIndex) {
     return persistenceKeyPrefix + ".columnModelIndex" + modelIndex + ".AtViewPos";
   }
-  
+
   static String toColumnModelWidthAt(String persistenceKeyPrefix, int modelIndex) {
     return persistenceKeyPrefix + ".columnModelIndex" + modelIndex + ".width";
   }
@@ -208,7 +208,7 @@ public class PreferencesBinding {
   public PreferencesBinding(String path) {
     preferences = Preferences.userRoot().node(path);
   }
-  
+
   public void addBinding(AbstractButton button, String persistenceKey, boolean defaultValue) {
     buttonKeys.put(button, persistenceKey);
     buttonDefaults.put(button, defaultValue);
@@ -220,34 +220,34 @@ public class PreferencesBinding {
     buttonDefaults.remove(button);
     button.removeChangeListener(booleanChangeListener);
   }
-  
+
   public void addBinding(JTextComponent text, String persistenceKey, String defaultValue) {
     textKeys.put(text.getDocument(), persistenceKey);
     textDefaults.put(text.getDocument(), defaultValue);
     text.getDocument().addDocumentListener(textChangeListener);
   }
-  
+
   public void removeBinding(JTextComponent text) {
     textKeys.remove(text.getDocument());
     textDefaults.remove(text.getDocument());
     text.getDocument().removeDocumentListener(textChangeListener);
   }
-  
+
   /**
    * the model has to have serializable objects
    */
   public void addBinding(JSpinner spinner, String persistenceKey, Serializable defaultValue) {
     serializableKeys.put(spinner.getModel(), persistenceKey);
     serializableDefaults.put(spinner.getModel(), defaultValue);
-    spinner.getModel().addChangeListener(serializableChangeListener);    
+    spinner.getModel().addChangeListener(serializableChangeListener);
   }
-  
+
   public void removeBinding(JSpinner spinner) {
     serializableKeys.remove(spinner.getModel());
     serializableDefaults.remove(spinner.getModel());
     spinner.getModel().removeChangeListener(serializableChangeListener);
   }
-  
+
   public void addBinding(JXTable table, String persistenceKey) {
     TableColumnModelExt model = (TableColumnModelExt) table.getColumnModel();
     tableColumnModelKeys.put(model, persistenceKey);
@@ -276,7 +276,7 @@ public class PreferencesBinding {
     for (Map.Entry<AbstractButton, String> binding : buttonKeys.entrySet()) {
       binding.getKey().setSelected(preferences.getBoolean(binding.getValue(), buttonDefaults.get(binding.getKey())));
     }
-    
+
     for (Map.Entry<Document, String> binding : textKeys.entrySet()) {
       try {
         binding.getKey().insertString(0, preferences.get(binding.getValue(), textDefaults.get(binding.getKey())), null);
@@ -284,13 +284,13 @@ public class PreferencesBinding {
         ex.printStackTrace();
       }
     }
-    
+
     for (Map.Entry<SpinnerModel, String> binding : serializableKeys.entrySet()) {
       byte [] serializedObject = preferences.getByteArray(binding.getValue(),
               toByteArray(serializableDefaults.get(binding.getKey())));
       binding.getKey().setValue(toObject(serializedObject));
     }
-    
+
     for (Entry<TableColumnModelExt, String> binding : tableColumnModelKeys.entrySet()) {
       String keyPrefix = binding.getValue();
       TableColumnModelExt model = binding.getKey();
@@ -299,28 +299,28 @@ public class PreferencesBinding {
         tableColumn.setPreferredWidth(preferences.getInt(toColumnModelWidthAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.getPreferredWidth()));
         tableColumn.setVisible(preferences.getBoolean(toColumnModelVisibleAt(keyPrefix, tableColumn.getModelIndex()), tableColumn.isVisible()));
       }
-      
+
       int storedColumnCount = preferences.getInt(toColumnCountKey(keyPrefix), 0);
       SortedMap<Integer, Integer> modelToView = new TreeMap<>();
       for (int col = 0; col < storedColumnCount; col++) {
         if (! ((TableColumnExt) model.getColumns(true).get(col)).isVisible())
           continue;
-        
+
         modelToView.put(col, preferences.getInt(toColumnModelIndexAt(keyPrefix, col), col));
       }
       int visibleModelColumn = 0;
       for (int modelColumn = 0; modelColumn < storedColumnCount; modelColumn++) {
         if (! ((TableColumnExt) model.getColumns(true).get(modelColumn)).isVisible())
           continue;
-        
+
         int viewColumn = modelToView.getOrDefault(modelColumn, modelColumn);
         if (viewColumn < visibleModelColumn)
           model.moveColumn(visibleModelColumn, viewColumn);
-        
+
         visibleModelColumn++;
       }
     }
-    
+
     persistenceActive = true;
   }
 
@@ -339,15 +339,15 @@ public class PreferencesBinding {
       return new byte[0];
     }
   }
-  
+
   static Object toObject(byte[] array) {
     try (ByteArrayInputStream byteArray = new ByteArrayInputStream(array);
          ObjectInputStream stream = new ObjectInputStream(byteArray)) {
       return stream.readObject();
     } catch (IOException | ClassNotFoundException ex) {
-      Logger.getLogger(PreferencesBinding.class.getName()).log(Level.WARNING, "not deserializable", ex);      
+      Logger.getLogger(PreferencesBinding.class.getName()).log(Level.WARNING, "not deserializable", ex);
       return null;
     }
   }
-  
+
 }

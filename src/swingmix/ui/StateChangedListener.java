@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -38,7 +38,7 @@ import javax.swing.event.*;
 
 /**
  * created 17.04.2015
- * @author jan
+ * @author Jan Schlößin
  */
 public class StateChangedListener implements DocumentListener, ChangeListener {
   private final Runnable job;

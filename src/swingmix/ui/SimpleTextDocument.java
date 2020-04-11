@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import javax.swing.text.*;
 
 /**
  * created 2011-05-03
- * @author jan
+ * @author Jan Schlößin
  */
 public class SimpleTextDocument implements Document {
   private PlainDocument doc = new PlainDocument();
@@ -112,7 +112,7 @@ public class SimpleTextDocument implements Document {
   public void setText(String text) {
     if (text == null)
       text = "";
-    
+
     int minLen = Math.min(text.length(), getLength());
     try {
       doc.replace(0, minLen, text, null);
@@ -126,7 +126,7 @@ public class SimpleTextDocument implements Document {
       throw new RuntimeException(ex);
     }
   }
-  
+
   @Override
   public void addDocumentListener(DocumentListener listener) {
     myListeners.add(listener);

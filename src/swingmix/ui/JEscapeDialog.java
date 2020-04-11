@@ -1,5 +1,5 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
+ *  Copyright 2009-2020 Jan Schlößin
  *
  *  This file is part of SwingMix.
  *
@@ -42,7 +42,7 @@ import javax.swing.*;
 /**
  * based on an article By Eugene Podgorbunskikh, JavaWorld.com, 03/01/99
  *
- * @author jan
+ * @author Jan Schlößin
  */
 public class JEscapeDialog extends JDialog implements ContainerListener, KeyListener
 {

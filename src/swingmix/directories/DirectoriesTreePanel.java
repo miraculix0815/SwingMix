@@ -1,6 +1,6 @@
 /**
- *  Copyright 2009-2015 Jan Schlößin
- * 
+ *  Copyright 2009-2020 Jan Schlößin
+ *
  *  This file is part of SwingMix.
  *
  *  SwingMix is free software: you can redistribute it and/or modify
@@ -42,7 +42,7 @@ import javax.swing.tree.*;
 
 /**
  * Created on 09.09.2009, 11:25:53
- * @author jan
+ * @author Jan Schlößin
  */
 public class DirectoriesTreePanel
         extends javax.swing.JPanel
