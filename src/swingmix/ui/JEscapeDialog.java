@@ -119,7 +119,8 @@ public class JEscapeDialog extends JDialog implements ContainerListener, KeyList
   public void keyPressed(KeyEvent e) {
     int code = e.getKeyCode();
     if (code == KeyEvent.VK_ESCAPE)
-      performEscapeKeyAction();
+      if (! isATableIsInEditMode())
+        performEscapeKeyAction();
 
     else if (code == KeyEvent.VK_ENTER) {
       if (! isATableIsInEditMode())
