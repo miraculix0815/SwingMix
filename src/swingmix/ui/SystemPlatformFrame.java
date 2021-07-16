@@ -53,12 +53,6 @@ public abstract class SystemPlatformFrame extends JFrame {
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
       MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
     }
-//    try {
-//      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-//      java.util.logging.Logger.getLogger(SystemPlatformFrame.class.getName())
-//              .log(java.util.logging.Level.SEVERE, null, ex);
-//    }
     SwingUtilities.updateComponentTreeUI(this);
   }
 

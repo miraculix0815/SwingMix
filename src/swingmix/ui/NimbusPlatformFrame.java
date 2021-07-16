@@ -47,15 +47,17 @@ public abstract class NimbusPlatformFrame extends JFrame {
     setLocationByPlatform(true);
   }
 
-  private static void tryToSetNimbus() {
+  private void tryToSetNimbus() {
     try {
       for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
         if ("Nimbus".equals(info.getName())) {
           UIManager.setLookAndFeel(info.getClassName());
+          SwingUtilities.updateComponentTreeUI(this);
           return;
         }
       }
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      SwingUtilities.updateComponentTreeUI(this);
     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
       MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
     }
