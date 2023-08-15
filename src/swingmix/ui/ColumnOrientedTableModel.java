@@ -89,18 +89,18 @@ public abstract class ColumnOrientedTableModel<T> extends AbstractTableModel {
   @Override
   public Object getValueAt(int rowIndex, int columnIndex) {
     T rowElement = rows.getElementAt(rowIndex);
-    Function<T, Object> valueExtractor = columnList.get(columnIndex).getValueExtractor();
+    Function<T, Object> valueExtractor = columnList.get(columnIndex).extractor();
     return valueExtractor.apply(rowElement);
   }
 
   @Override
   public Class<?> getColumnClass(int columnIndex) {
-    return columnList.get(columnIndex).getColumnClass();
+    return columnList.get(columnIndex).clazz();
   }
 
   @Override
   public String getColumnName(int column) {
-    return columnList.get(column).getName();
+    return columnList.get(column).title();
   }
 
   protected boolean addColumn(ColumnEntry<T> e) {
