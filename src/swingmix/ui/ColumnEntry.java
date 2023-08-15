@@ -43,7 +43,13 @@ import java.util.function.Function;
 public record ColumnEntry<T>(
         String title,
         Class<?> clazz,
+        int defaultWidth,
         Function<T, Object> extractor
-) {
+      ) {
+
+  public ColumnEntry(String title,
+          Class<?> clazz, Function<T, Object> extractor) {
+    this(title, clazz, 0, extractor);
+  }
 
 }
