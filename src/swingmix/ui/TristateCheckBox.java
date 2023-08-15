@@ -1,5 +1,6 @@
 package swingmix.ui;
 
+import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -18,23 +19,33 @@ import javax.swing.plaf.ActionMapUIResource;
  * "released".
  * 5. You have to grab focus when the next state is entered,
  * otherwise clicking on the component won't get the focus.
- * 6. You have to make a TristateDecorator as a button model that
- * wraps the original button model and does state management.
+ * 6. You have to use a TristateModel as a button model that
+ * uses the Armed property to implement the third state and
+ * does state management.
  *
  * @author Dr. Heinz M. Kabutz from http://www.javaspecialists.co.za/archive/Issue082.html
  */
 public class TristateCheckBox extends JCheckBox {
 
   public static enum State {
-
     NOT_SELECTED,
     SELECTED,
     DONT_CARE;
+
+    public State next() {
+      return switch (this) {
+        case NOT_SELECTED -> SELECTED;
+        case SELECTED -> DONT_CARE;
+        case DONT_CARE -> NOT_SELECTED;
+      };
+    }
   }
-  private final TristateDecorator model;
+
+  private final TristateModel model = new TristateModel();
 
   public TristateCheckBox(String text, Icon icon, State initial) {
     super(text, icon);
+
     // Add a listener for when the mouse is pressed
     super.addMouseListener(new MouseAdapter() {
 
@@ -44,6 +55,7 @@ public class TristateCheckBox extends JCheckBox {
         model.nextState();
       }
     });
+
     // Reset the keyboard action map
     ActionMap map = new ActionMapUIResource();
     map.put("pressed", new AbstractAction() {
@@ -56,8 +68,7 @@ public class TristateCheckBox extends JCheckBox {
     });
     map.put("released", null);
     SwingUtilities.replaceUIActionMap(this, map);
-    // set the model to the adapted model
-    model = new TristateDecorator(getModel());
+
     setModel(model);
     setState(initial);
   }
@@ -81,13 +92,13 @@ public class TristateCheckBox extends JCheckBox {
 
   /**
    * We have to prevent the focus listener to destoy our armed and pressed state.
-   * So we override the focus handler and do a simple repaint on focus gain 
+   * So we override the focus handler and do a simple repaint on focus gain
    * and focus lost.
-   * 
+   *
    * This is not relavant in a JTreeView because we can not gain focus there.
    * So this trick became necessary in a standalone application.
-   * 
-   * @param e 
+   *
+   * @param e
    */
   @Override
   protected void processFocusEvent(FocusEvent e) {
@@ -109,41 +120,47 @@ public class TristateCheckBox extends JCheckBox {
 
   @Override
   public void setSelected(boolean b) {
-    if (b) {
-      setState(State.SELECTED);
-    } else {
-      setState(State.NOT_SELECTED);
-    }
+    setState(b ? State.SELECTED : State.NOT_SELECTED);
   }
 
-  /**
-   * Exactly which Design Pattern is this?  Is it an Adapter,
-   * a Proxy or a Decorator?  In this case, my vote lies with the
-   * Decorator, because we are extending functionality and
-   * "decorating" the original model with a more powerful model.
-   */
-  private class TristateDecorator implements ButtonModel {
+  private class TristateModel extends ToggleButtonModel {
 
-    private final ButtonModel other;
-
-    private TristateDecorator(ButtonModel other) {
-      this.other = other;
+    private void fireActionPerformed() {
+      int modifiers = 0;
+      AWTEvent currentEvent = EventQueue.getCurrentEvent();
+      if (currentEvent instanceof InputEvent inputEvent) {
+          modifiers = inputEvent.getModifiers();
+      } else if (currentEvent instanceof ActionEvent actionEvent) {
+          modifiers = actionEvent.getModifiers();
+      }
+      fireActionPerformed(
+              new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
+                      getActionCommand(),
+                      EventQueue.getMostRecentEventTime(),
+                      modifiers));
     }
 
     private void setState(State state) {
+      var oldState = getState();
       if (state == State.NOT_SELECTED) {
-        other.setArmed(false);
+        super.setArmed(false);
         setPressed(false);
         setSelected(false);
       } else if (state == State.SELECTED) {
-        other.setArmed(false);
+        super.setArmed(false);
         setPressed(false);
         setSelected(true);
       } else { // either "null" or DONT_CARE
-        other.setArmed(true);
+        super.setArmed(true);
         setPressed(true);
         setSelected(true);
       }
+
+      if (getState() != oldState)
+        // changing armed and pressed state originally isn't an action
+        // since we are using it to encode our additional state
+        // we have to fire action performed events when changing it as well
+        fireActionPerformed();
     }
 
     /**
@@ -170,14 +187,7 @@ public class TristateCheckBox extends JCheckBox {
 
     /** We rotate between NOT_SELECTED, SELECTED and DONT_CARE.*/
     private void nextState() {
-      State current = getState();
-      if (current == State.NOT_SELECTED) {
-        setState(State.SELECTED);
-      } else if (current == State.SELECTED) {
-        setState(State.DONT_CARE);
-      } else if (current == State.DONT_CARE) {
-        setState(State.NOT_SELECTED);
-      }
+      setState(getState().next());
     }
 
     /** Filter: No one may change the armed status except us. */
@@ -190,109 +200,9 @@ public class TristateCheckBox extends JCheckBox {
     @Override
     public void setEnabled(boolean b) {
       setFocusable(b);
-      other.setEnabled(b);
+      super.setEnabled(b);
     }
 
-    /** All these methods simply delegate to the "other" model
-     * that is being decorated. */
-    @Override
-    public boolean isArmed() {
-      return other.isArmed();
-    }
-
-    @Override
-    public boolean isSelected() {
-      return other.isSelected();
-    }
-
-    @Override
-    public boolean isEnabled() {
-      return other.isEnabled();
-    }
-
-    @Override
-    public boolean isPressed() {
-      return other.isPressed();
-    }
-
-    @Override
-    public boolean isRollover() {
-      return other.isRollover();
-    }
-
-    @Override
-    public void setSelected(boolean b) {
-      other.setSelected(b);
-    }
-
-    @Override
-    public void setPressed(boolean b) {
-      other.setPressed(b);
-    }
-    
-    @Override
-    public void setRollover(boolean b) {
-      other.setRollover(b);
-    }
-
-    @Override
-    public void setMnemonic(int key) {
-      other.setMnemonic(key);
-    }
-
-    @Override
-    public int getMnemonic() {
-      return other.getMnemonic();
-    }
-
-    @Override
-    public void setActionCommand(String s) {
-      other.setActionCommand(s);
-    }
-
-    @Override
-    public String getActionCommand() {
-      return other.getActionCommand();
-    }
-
-    @Override
-    public void setGroup(ButtonGroup group) {
-      other.setGroup(group);
-    }
-
-    @Override
-    public void addActionListener(ActionListener l) {
-      other.addActionListener(l);
-    }
-
-    @Override
-    public void removeActionListener(ActionListener l) {
-      other.removeActionListener(l);
-    }
-
-    @Override
-    public void addItemListener(ItemListener l) {
-      other.addItemListener(l);
-    }
-
-    @Override
-    public void removeItemListener(ItemListener l) {
-      other.removeItemListener(l);
-    }
-
-    @Override
-    public void addChangeListener(ChangeListener l) {
-      other.addChangeListener(l);
-    }
-
-    @Override
-    public void removeChangeListener(ChangeListener l) {
-      other.removeChangeListener(l);
-    }
-
-    @Override
-    public Object[] getSelectedObjects() {
-      return other.getSelectedObjects();
-    }
   }
+
 }
