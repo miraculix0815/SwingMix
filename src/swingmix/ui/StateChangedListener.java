@@ -34,13 +34,14 @@
 
 package swingmix.ui;
 
+import java.awt.event.*;
 import javax.swing.event.*;
 
 /**
  * created 17.04.2015
  * @author Jan Schlößin
  */
-public class StateChangedListener implements DocumentListener, ChangeListener {
+public class StateChangedListener implements DocumentListener, ActionListener {
   private final Runnable job;
 
   public StateChangedListener(Runnable job) {
@@ -63,7 +64,7 @@ public class StateChangedListener implements DocumentListener, ChangeListener {
   }
 
   @Override
-  public void stateChanged(ChangeEvent e) {
+  public void actionPerformed(ActionEvent e) {
     job.run();
   }
 
