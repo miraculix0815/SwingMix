@@ -15,7 +15,6 @@
       <groupId>de.schloessin</groupId>
       <artifactId>SwingX-1.6.5-1-jms</artifactId>
       <version>1.6.5</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
