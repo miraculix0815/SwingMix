@@ -34,6 +34,7 @@
 
 package swingmix.ui;
 
+import java.awt.event.*;
 import java.beans.*;
 import java.io.*;
 import java.util.Map.Entry;
@@ -43,6 +44,7 @@ import java.util.logging.*;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.swing.*;
+import static javax.swing.JFileChooser.*;
 import javax.swing.event.*;
 import javax.swing.table.TableColumn;
 import javax.swing.text.*;
@@ -67,6 +69,8 @@ public class PreferencesBinding {
 
   private final Map<TableColumnModelExt, String> tableColumnModelKeys = new HashMap<>();
   private final Map<TableColumnExt, String> tableColumnKeys = new HashMap<>();
+
+  private final Map<JFileChooser, String> fileChooserKeys = new HashMap<>();
 
   private boolean persistenceActive = false;
 
@@ -205,6 +209,21 @@ public class PreferencesBinding {
     return persistenceKeyPrefix + ".columnModelIndex" + modelIndex + ".visible";
   }
 
+  private final ActionListener fileChooserActionListener = new ActionListener() {
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (APPROVE_SELECTION.equals(e.getActionCommand())) {
+        if (e.getSource() instanceof JFileChooser jFileChooser) {
+          String key = fileChooserKeys.get(jFileChooser);
+          if (key != null)
+            preferences.put(key, jFileChooser.getSelectedFile().toString());
+        }
+      }
+    }
+
+  };
+
   public PreferencesBinding(String path) {
     preferences = Preferences.userRoot().node(path);
   }
@@ -269,6 +288,16 @@ public class PreferencesBinding {
     }
   }
 
+  public void addBinding(JFileChooser fileChooser, String persistenceKey) {
+    fileChooserKeys.put(fileChooser, persistenceKey);
+    fileChooser.addActionListener(fileChooserActionListener);
+  }
+
+  public void removeBinding(JFileChooser fileChooser) {
+    fileChooserKeys.remove(fileChooser);
+    fileChooser.removeActionListener(fileChooserActionListener);
+  }
+
   /**
    * activates persistance
    */
@@ -319,6 +348,10 @@ public class PreferencesBinding {
 
         visibleModelColumn++;
       }
+    }
+
+    for (var binding : fileChooserKeys.entrySet()) {
+      binding.getKey().setSelectedFile(new File(preferences.get(binding.getValue(), "")));
     }
 
     persistenceActive = true;
