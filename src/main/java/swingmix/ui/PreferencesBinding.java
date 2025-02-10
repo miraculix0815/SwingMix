@@ -351,7 +351,8 @@ public class PreferencesBinding {
     }
 
     for (var binding : fileChooserKeys.entrySet()) {
-      binding.getKey().setSelectedFile(new File(preferences.get(binding.getValue(), "")));
+      String pathName = preferences.get(binding.getValue(), "");
+      binding.getKey().setSelectedFile(pathName != null ? new File(pathName) : null);
     }
 
     persistenceActive = true;
